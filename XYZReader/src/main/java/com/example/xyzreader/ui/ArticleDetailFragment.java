@@ -1,23 +1,24 @@
 package com.example.xyzreader.ui;
 
-import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.app.ShareCompat;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.format.DateUtils;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
@@ -44,15 +45,18 @@ public class ArticleDetailFragment extends Fragment implements
     private Cursor mCursor;
     private long mItemId;
     private View mRootView;
-    private int mMutedColor = 0xFF333333;
-    private DrawInsetsFrameLayout mDrawInsetsFrameLayout;
-    private ColorDrawable mStatusBarColorDrawable;
+
+    private ImageView mPhoto;
+    private CollapsingToolbarLayout mCollapsingToolbarLayout;
+    private ActionBar mSupportActionBar;
+
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     // Use default locale format
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
     // Most time functions can only handle 1902 - 2037
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2, 1, 1);
+
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -96,37 +100,29 @@ public class ArticleDetailFragment extends Fragment implements
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
-        mDrawInsetsFrameLayout = mRootView.findViewById(R.id.draw_insets_frame_layout);
 
-        ObservableScrollView mScrollView = mRootView.findViewById(R.id.scrollview);
-        mScrollView.setCallbacks(new ObservableScrollView.Callbacks() {
-            @Override
-            public void onScrollChanged() {
-                updateStatusBar();
-            }
-        });
+//            public void onClick(View view) {
+//                startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
+//                        .setType("text/plain")
+//                        .setText("Some sample text")
+//                        .getIntent(), getString(R.string.action_share)));
 
-        mStatusBarColorDrawable = new ColorDrawable(0);
+        mPhoto = mRootView.findViewById(R.id.photo);
 
-        mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
-                        .setType("text/plain")
-                        .setText("Some sample text")
-                        .getIntent(), getString(R.string.action_share)));
-            }
-        });
+        mCollapsingToolbarLayout = mRootView.findViewById(R.id.collapsing_toolbar_container);
+        mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
+        mCollapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.white));
+
+        AppCompatActivity appCompatActivity = ((AppCompatActivity) getActivity());
+        Toolbar toolbar = mRootView.findViewById(R.id.toolbar);
+        appCompatActivity.setSupportActionBar(toolbar);
+        mSupportActionBar = appCompatActivity.getSupportActionBar();
+        mSupportActionBar.setDisplayHomeAsUpEnabled(true);
+        mSupportActionBar.setDisplayShowTitleEnabled(false);
 
         bindViews();
-        updateStatusBar();
-        return mRootView;
-    }
 
-    private void updateStatusBar() {
-        int color = 0;
-        mStatusBarColorDrawable.setColor(color);
-        mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
+        return mRootView;
     }
 
     private Date parsePublishedDate() {
@@ -146,59 +142,65 @@ public class ArticleDetailFragment extends Fragment implements
         }
 
         TextView titleView = mRootView.findViewById(R.id.article_title);
-        TextView bylineView = mRootView.findViewById(R.id.article_byline);
-        bylineView.setMovementMethod(new LinkMovementMethod());
+        TextView byLineView = mRootView.findViewById(R.id.article_byline);
         TextView bodyView = mRootView.findViewById(R.id.article_body);
+        final LinearLayout titleBylineView = mRootView.findViewById(R.id.linear_layout_title_container);
 
         if (mCursor != null) {
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
-            titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+
+            String titleString = mCursor.getString(ArticleLoader.Query.TITLE);
+            titleView.setText(titleString);
+            mCollapsingToolbarLayout.setTitle(titleString);
+
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
-                bylineView.setText(Html.fromHtml(
-                        DateUtils.getRelativeTimeSpanString(
-                                publishedDate.getTime(),
-                                System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-                                DateUtils.FORMAT_ABBREV_ALL).toString()
-                                + " by <font color='#ffffff'>"
-                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                                + "</font>"));
+                byLineView.setText(
+                        Html.fromHtml(
+                                DateUtils.getRelativeTimeSpanString(
+                                        publishedDate.getTime(),
+                                        System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
+                                        DateUtils.FORMAT_ABBREV_ALL).toString()
+                                        + " by "
+                                        + mCursor.getString(ArticleLoader.Query.AUTHOR))
+                );
 
             } else {
                 // If date is before 1902, just show the string
-                bylineView.setText(Html.fromHtml(
-                        outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
-                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                                + "</font>"));
+                byLineView.setText(
+                        Html.fromHtml(
+                                outputFormat.format(publishedDate) + " by "
+                                        + mCursor.getString(ArticleLoader.Query.AUTHOR))
+                );
 
             }
-            bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+
+            bodyView.setText(Html.fromHtml(
+                    mCursor.getString(ArticleLoader.Query.BODY)
+                            .replaceAll("(\r\n|\n)", "<br />")));
+
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
                         @Override
                         public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
-                            Bitmap bitmap = imageContainer.getBitmap();
-                            if (bitmap != null) {
-                                //Palette p = Palette.generate(bitmap, 12);
-                                Palette p = new Palette.Builder(bitmap).maximumColorCount(12).generate();
-                                mMutedColor = p.getDarkMutedColor(0xFF333333);
-                                mRootView.findViewById(R.id.meta_bar)
-                                        .setBackgroundColor(mMutedColor);
-                                updateStatusBar();
-                            }
+                            mPhoto.setImageBitmap(imageContainer.getBitmap());
+                            Palette p = new Palette.Builder(imageContainer.getBitmap())
+                                    .maximumColorCount(12)
+                                    .generate();
+                            int darkMutedColor = p.getDarkMutedColor(0);
+                            mCollapsingToolbarLayout.setContentScrimColor(darkMutedColor);
+                            titleBylineView.setBackgroundColor(darkMutedColor);
                         }
 
                         @Override
                         public void onErrorResponse(VolleyError volleyError) {
-
+                            Log.e(TAG, "Image could not be loaded.");
                         }
                     });
         } else {
             mRootView.setVisibility(View.GONE);
-            titleView.setText("N/A");
-            bylineView.setText("N/A");
             bodyView.setText("N/A");
         }
     }
