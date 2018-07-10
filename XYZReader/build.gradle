@@ -21,6 +21,9 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 27
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 }
 
