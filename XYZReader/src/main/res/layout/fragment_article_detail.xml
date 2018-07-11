@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/toolbar_container"
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -13,6 +13,9 @@
             android:id="@+id/collapsing_toolbar_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:expandedTitleMarginBottom="16dp"
+            app:expandedTitleMarginStart="@dimen/detail_inner_horiz_margin"
+            app:expandedTitleTextAppearance="@style/Toolbar_Title"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <ImageView
@@ -27,10 +30,7 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:elevation="4dp"
-                android:theme="@style/Theme.AppCompat.NoActionBar"
-                app:elevation="4dp"
+                android:layout_height="?android:attr/actionBarSize"
                 app:layout_collapseMode="pin">
 
             </android.support.v7.widget.Toolbar>
@@ -65,18 +65,6 @@
                 android:paddingTop="@dimen/detail_metabar_vert_padding">
 
                 <TextView
-                    android:id="@+id/article_title"
-                    style="?android:attr/textAppearanceLarge"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-condensed"
-                    android:lineSpacingMultiplier="0.9"
-                    android:paddingBottom="@dimen/detail_metabar_title_bottom_padding"
-                    android:textColor="#fff"
-                    android:textSize="@dimen/detail_title_text_size"
-                    android:textStyle="bold"/>
-
-                <TextView
                     android:id="@+id/article_byline"
                     style="?android:attr/textAppearanceSmall"
                     android:layout_width="wrap_content"
@@ -95,7 +83,7 @@
                 android:lineSpacingMultiplier="@fraction/detail_body_line_spacing_multiplier"
                 android:paddingBottom="@dimen/detail_body_bottom_margin"
                 android:paddingTop="8dp"
-                android:textColor="?android:textColorPrimary"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textColorLink="?attr/colorAccent"
                 android:textSize="@dimen/detail_body_text_size"/>
 

@@ -3,6 +3,8 @@ package com.example.xyzreader.ui;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -52,7 +54,6 @@ public class ArticleDetailFragment extends Fragment implements
 
     private ImageView mPhoto;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
-    private ActionBar mSupportActionBar;
 
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
@@ -121,15 +122,18 @@ public class ArticleDetailFragment extends Fragment implements
         mPhoto = mRootView.findViewById(R.id.photo);
 
         mCollapsingToolbarLayout = mRootView.findViewById(R.id.collapsing_toolbar_container);
-        mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
+        //TODO Answer on StackOverflow
+        mCollapsingToolbarLayout.setExpandedTitleTypeface(Typeface.create(mCollapsingToolbarLayout.getExpandedTitleTypeface(), Typeface.BOLD));
+        mCollapsingToolbarLayout.setCollapsedTitleTypeface(Typeface.create(mCollapsingToolbarLayout.getExpandedTitleTypeface(), Typeface.BOLD));
         mCollapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.white));
 
         AppCompatActivity appCompatActivity = ((AppCompatActivity) getActivity());
         Toolbar toolbar = mRootView.findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         appCompatActivity.setSupportActionBar(toolbar);
-        mSupportActionBar = appCompatActivity.getSupportActionBar();
-        mSupportActionBar.setDisplayHomeAsUpEnabled(true);
-        mSupportActionBar.setDisplayShowTitleEnabled(false);
+        ActionBar actionBar = appCompatActivity.getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
 
         bindViews();
 
@@ -152,7 +156,6 @@ public class ArticleDetailFragment extends Fragment implements
             return;
         }
 
-        TextView titleView = mRootView.findViewById(R.id.article_title);
         TextView byLineView = mRootView.findViewById(R.id.article_byline);
         TextView bodyView = mRootView.findViewById(R.id.article_body);
         final LinearLayout titleBylineView = mRootView.findViewById(R.id.linear_layout_title_container);
@@ -163,7 +166,6 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.animate().alpha(1);
 
             String titleString = mCursor.getString(ArticleLoader.Query.TITLE);
-            titleView.setText(titleString);
             mCollapsingToolbarLayout.setTitle(titleString);
 
             Date publishedDate = parsePublishedDate();
@@ -200,7 +202,7 @@ public class ArticleDetailFragment extends Fragment implements
                             Palette p = new Palette.Builder(imageContainer.getBitmap())
                                     .maximumColorCount(12)
                                     .generate();
-                            int darkMutedColor = p.getDarkMutedColor(0);
+                            int darkMutedColor = p.getDarkMutedColor(Color.BLACK);
                             mCollapsingToolbarLayout.setContentScrimColor(darkMutedColor);
                             titleBylineView.setBackgroundColor(darkMutedColor);
                             mFab.setBackgroundTintList(ColorStateList.valueOf(darkMutedColor));
