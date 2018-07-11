@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="photo_placeholder">#ccc</color>
+    <color name="byline_text_color">#8fff</color>
 </resources>

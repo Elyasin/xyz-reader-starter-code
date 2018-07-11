@@ -26,6 +26,8 @@
         <item name="android:fontFamily">sans-serif-condensed</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">@dimen/detail_title_text_size</item>
+        <!-- Collapsing Toolbar does not take this attribute into account -->
+        <!-- Type face set to bold programmatically as workaround -->
         <item name="android:textStyle">bold</item>
     </style>
 

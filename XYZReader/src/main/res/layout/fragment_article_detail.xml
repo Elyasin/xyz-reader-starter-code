@@ -13,7 +13,7 @@
             android:id="@+id/collapsing_toolbar_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:expandedTitleMarginBottom="16dp"
+            app:expandedTitleMarginBottom="@dimen/toolbar_title_bottom_margin"
             app:expandedTitleMarginStart="@dimen/detail_inner_horiz_margin"
             app:expandedTitleTextAppearance="@style/Toolbar_Title"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
@@ -49,7 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:background="#fff"
+            android:background="@android:color/white"
             android:maxWidth="@dimen/detail_card_max_width"
             android:orientation="vertical">
 
@@ -69,7 +69,7 @@
                     style="?android:attr/textAppearanceSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#8fff"/>
+                    android:textColor="@color/byline_text_color"/>
 
             </LinearLayout>
 
@@ -82,7 +82,7 @@
                 android:layout_marginRight="@dimen/detail_inner_horiz_margin"
                 android:lineSpacingMultiplier="@fraction/detail_body_line_spacing_multiplier"
                 android:paddingBottom="@dimen/detail_body_bottom_margin"
-                android:paddingTop="8dp"
+                android:paddingTop="@dimen/body_padding_top"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textColorLink="?attr/colorAccent"
                 android:textSize="@dimen/detail_body_text_size"/>

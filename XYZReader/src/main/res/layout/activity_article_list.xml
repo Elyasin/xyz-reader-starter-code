@@ -13,8 +13,6 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize"
-            android:elevation="4dp"
-            app:elevation="4dp"
             app:logo="@drawable/logo"/>
 
     </android.support.design.widget.AppBarLayout>
@@ -30,10 +28,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="28dp"
+            android:paddingBottom="@dimen/article_list_padding_bottom"
             android:paddingLeft="@dimen/list_side_margin"
             android:paddingRight="@dimen/list_side_margin"
-            android:paddingTop="8dp"
+            android:paddingTop="@dimen/article_list_padding_top"
             android:scrollbarStyle="outsideOverlay"/>
     </android.support.v4.widget.SwipeRefreshLayout>
 
