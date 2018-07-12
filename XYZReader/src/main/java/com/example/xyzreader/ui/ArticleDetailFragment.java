@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,18 +33,20 @@ import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
  * either contained in a {@link ArticleListActivity} in two-pane mode (on
  * tablets) or a {@link ArticleDetailActivity} on handsets.
  */
-public class ArticleDetailFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+public class ArticleDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
     private static final String TAG = "ArticleDetailFragment";
 
     public static final String ARG_ITEM_ID = "item_id";
@@ -56,9 +59,9 @@ public class ArticleDetailFragment extends Fragment implements
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
 
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss", Locale.getDefault());
     // Use default locale format
-    private SimpleDateFormat outputFormat = new SimpleDateFormat();
+    private DateFormat outputFormat = SimpleDateFormat.getDateInstance();
     // Most time functions can only handle 1902 - 2037
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2, 1, 1);
     private FloatingActionButton mFab;
@@ -111,10 +114,11 @@ public class ArticleDetailFragment extends Fragment implements
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
-                        .setType("text/plain")
-                        .setText("Some sample text")
-                        .getIntent(), getString(R.string.action_share)));
+                if (getActivity() != null)
+                    startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
+                            .setType("text/plain")
+                            .setText("Some sample text")
+                            .getIntent(), getString(R.string.action_share)));
 
             }
         });
@@ -130,10 +134,14 @@ public class ArticleDetailFragment extends Fragment implements
         AppCompatActivity appCompatActivity = ((AppCompatActivity) getActivity());
         Toolbar toolbar = mRootView.findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        appCompatActivity.setSupportActionBar(toolbar);
-        ActionBar actionBar = appCompatActivity.getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
+        if (appCompatActivity != null) {
+            appCompatActivity.setSupportActionBar(toolbar);
+            ActionBar actionBar = appCompatActivity.getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setDisplayShowTitleEnabled(false);
+            }
+        }
 
         bindViews();
 
@@ -157,7 +165,9 @@ public class ArticleDetailFragment extends Fragment implements
         }
 
         TextView byLineView = mRootView.findViewById(R.id.article_byline);
-        TextView bodyView = mRootView.findViewById(R.id.article_body);
+        WebView bodyView = mRootView.findViewById(R.id.article_body);
+        bodyView.getSettings().setTextZoom(150);
+        bodyView.getSettings().set
         final LinearLayout titleBylineView = mRootView.findViewById(R.id.linear_layout_title_container);
 
         if (mCursor != null) {
@@ -190,9 +200,13 @@ public class ArticleDetailFragment extends Fragment implements
 
             }
 
-            bodyView.setText(Html.fromHtml(
-                    mCursor.getString(ArticleLoader.Query.BODY)
-                            .replaceAll("(\r\n|\n)", "<br />")));
+            //TODO very slow
+            bodyView.loadData(mCursor.getString(ArticleLoader.Query.BODY)
+                    .replaceAll("(\r\n|\n)", "<br />"), null, null);
+//            bodyView.setText(Html.fromHtml(
+//                    mCursor.getString(ArticleLoader.Query.BODY)
+//                            .replaceAll("(\r\n|\n)", "<br />")));
+
 
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
@@ -215,9 +229,11 @@ public class ArticleDetailFragment extends Fragment implements
                     });
         } else {
             mRootView.setVisibility(View.GONE);
-            bodyView.setText("N/A");
+            //bodyView.setText("Loading. Please wait.");
+            bodyView.loadData("Loading. Please wait.", null, null);
         }
     }
+
 
     @NonNull
     @Override

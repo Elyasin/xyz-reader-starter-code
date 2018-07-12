@@ -47,7 +47,7 @@
 
         <com.example.xyzreader.ui.MaxWidthLinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:background="@android:color/white"
             android:maxWidth="@dimen/detail_card_max_width"
@@ -73,7 +73,7 @@
 
             </LinearLayout>
 
-            <TextView
+            <WebView
                 android:id="@+id/article_body"
                 style="?android:attr/textAppearanceMedium"
                 android:layout_width="match_parent"
