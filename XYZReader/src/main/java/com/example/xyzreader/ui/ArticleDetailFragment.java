@@ -13,8 +13,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -126,27 +124,24 @@ public class ArticleDetailFragment extends Fragment implements LoaderManager.Loa
         mPhoto = mRootView.findViewById(R.id.photo);
 
         mCollapsingToolbarLayout = mRootView.findViewById(R.id.collapsing_toolbar_container);
-        //TODO Answer on StackOverflow
         mCollapsingToolbarLayout.setExpandedTitleTypeface(Typeface.create(mCollapsingToolbarLayout.getExpandedTitleTypeface(), Typeface.BOLD));
         mCollapsingToolbarLayout.setCollapsedTitleTypeface(Typeface.create(mCollapsingToolbarLayout.getExpandedTitleTypeface(), Typeface.BOLD));
         mCollapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.white));
 
-        AppCompatActivity appCompatActivity = ((AppCompatActivity) getActivity());
         Toolbar toolbar = mRootView.findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        if (appCompatActivity != null) {
-            appCompatActivity.setSupportActionBar(toolbar);
-            ActionBar actionBar = appCompatActivity.getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setDisplayShowTitleEnabled(false);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
             }
-        }
+        });
 
         bindViews();
 
         return mRootView;
     }
+
 
     private Date parsePublishedDate() {
         try {
@@ -165,9 +160,8 @@ public class ArticleDetailFragment extends Fragment implements LoaderManager.Loa
         }
 
         TextView byLineView = mRootView.findViewById(R.id.article_byline);
-        WebView bodyView = mRootView.findViewById(R.id.article_body);
-        bodyView.getSettings().setTextZoom(150);
-        bodyView.getSettings().set
+        WebView bodyWebView = mRootView.findViewById(R.id.article_body);
+        bodyWebView.getSettings().setDefaultFontSize(18);
         final LinearLayout titleBylineView = mRootView.findViewById(R.id.linear_layout_title_container);
 
         if (mCursor != null) {
@@ -200,12 +194,10 @@ public class ArticleDetailFragment extends Fragment implements LoaderManager.Loa
 
             }
 
-            //TODO very slow
-            bodyView.loadData(mCursor.getString(ArticleLoader.Query.BODY)
+            //Use of web view improves performances considerably
+            //Can we do better ?
+            bodyWebView.loadData(mCursor.getString(ArticleLoader.Query.BODY)
                     .replaceAll("(\r\n|\n)", "<br />"), null, null);
-//            bodyView.setText(Html.fromHtml(
-//                    mCursor.getString(ArticleLoader.Query.BODY)
-//                            .replaceAll("(\r\n|\n)", "<br />")));
 
 
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
@@ -229,8 +221,7 @@ public class ArticleDetailFragment extends Fragment implements LoaderManager.Loa
                     });
         } else {
             mRootView.setVisibility(View.GONE);
-            //bodyView.setText("Loading. Please wait.");
-            bodyView.loadData("Loading. Please wait.", null, null);
+            bodyWebView.loadData("Loading. Please wait.", null, null);
         }
     }
 
